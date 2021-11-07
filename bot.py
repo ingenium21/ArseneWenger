@@ -9,6 +9,9 @@ import europaTable
 from time import sleep
 from discord.utils import get
 from PIL import Image, ImageDraw, ImageFont
+from discord_slash import SlashCommand, SlashContext #Added for slash command
+from discord_slash.utils.manage_commands import create_choice, create_option
+import getStats
 
 prefix = '!'
 bot = discord.Client()
@@ -258,7 +261,40 @@ async def on_message(message):
             else:
                 await bot.delete_message(message)
 
+#Defining the options and choices to be passed to the /stat slash command
+statchoices=[]
+# #Additional code for slash cmds capability
+print('Fetching squad from FBRef...')#Squad list for slash comand
+getStats.fetchSquad()
+count=0
+for plyr in getStats.squadDict:
+  if count==25:
+    break
+  # plyrtemp=plyr.replace(" ","")
+  # plyrtemp=plyrtemp.lower()
+  statchoices.append(create_choice(name=plyr, value=plyr))
+  count=count+1
 
+statoptions=[create_option(name="player", description="Choose player", required=True, option_type=3, choices=statchoices)] 
+guild_id=[847278289013702707]#Needed to enable slash in selected servers
+
+#Change guild id to r/gunners (or any other) if necessary
+@slash.slash(name="stat", description="Get stats for selected Arsenal player", guild_ids=guild_id, options=statoptions)
+async def _stat(ctx, player:str): # Defines a new "context" (ctx) command called "stat."
+    await ctx.defer() # So that interaction does not timeout
+    url=getStats.squadDict[player][0].rsplit('/',1)
+    tableurl='https://fbref.com/'+url[0]+"/all_comps/"+url[1]+"-Stats---All-Competitions"
+    body=getStats.statParser(tableurl,getStats.squadDict[player][1])
+    embd=discord.Embed(title=player,description='Source: Fbref (Full stats [here]('+tableurl+'))')
+    img = Image.new('RGB', (1245, 250), (47,49,54))
+    d = ImageDraw.Draw(img)
+    font = ImageFont.truetype("AnonymousPro.ttf", 36)
+    d.text((5, 10), body, (255,255,255), font=font)
+    img.save('tempImg_Stat.png')
+    file_stat=discord.File('tempImg_Stat.png')
+    embd.set_image(url = "attachment://tempImg_Stat.png")
+    await ctx.send(content="",file=file_stat,embed=embd)
+    
 try:
     f = open('token.txt')
     token = f.readline()
