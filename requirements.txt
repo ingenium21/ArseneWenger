@@ -9,3 +9,4 @@ datetime
 tabulate
 Pillow
 pandas
+discord-py-slash-command
