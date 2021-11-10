@@ -15,6 +15,8 @@ import getStats
 
 prefix = '!'
 bot = discord.Client()
+slash= SlashCommand(bot,sync_commands=True) #Added for slash command 
+
 
 
 def getTimestamp():
@@ -276,7 +278,7 @@ for plyr in getStats.squadDict:
   count=count+1
 
 statoptions=[create_option(name="player", description="Choose player", required=True, option_type=3, choices=statchoices)] 
-guild_id=[847278289013702707]#Needed to enable slash in selected servers
+guild_id=[345262430357553153]#Needed to enable slash in selected servers
 
 #Change guild id to r/gunners (or any other) if necessary
 @slash.slash(name="stat", description="Get stats for selected Arsenal player", guild_ids=guild_id, options=statoptions)
