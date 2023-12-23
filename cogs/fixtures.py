@@ -310,6 +310,10 @@ def findFixtures(matches, number: int):
         #remove anything in the string that is not a number
         matchYear = ''.join(filter(str.isdigit, matchYear))
         matchYear = datetime.strptime(matchYear, '%Y')
+        matchYear = matchArray[0].split('\n\n')[1].strip()
+        #remove anything in the string that is not a number
+        matchYear = ''.join(filter(str.isdigit, matchYear))
+        matchYear = datetime.strptime(matchYear, '%Y')
         matchArray.pop(0) #pops the first element which is the month and year
         matchArray.pop(-1) #pops the last element which is an empty string
         for arr in matchArray:
@@ -318,7 +322,7 @@ def findFixtures(matches, number: int):
             if "(Date and time TBC)" in arr:
                 arr = arr.replace("(Date and time TBC)          ", "\n") #women's fixtures and results have this for some reason, replacing it with newline
             if "Time TBC" in arr:
-                arr = arr.replace("Time TBC          ", "15:00 \n") #some mens fixtures have this, replacing it with midnight until we get the time
+                arr = arr.replace("Time TBC          ", "00:00 \n") #some mens fixtures have this, replacing it with midnight until we get the time
             matchDate = arr.split('\n\n')[0].strip()
             try:
                 matchDate = datetime.strptime(matchDate, '%a %b %d - %H:%M')
